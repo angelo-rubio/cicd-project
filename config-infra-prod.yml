@@ -18,4 +18,5 @@ variables:
 
   # For pipeline reference
   resource_group: resource_group_gl
-  aml_workspace: ai_learning
+  aml_workspace: ml2
+
