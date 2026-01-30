@@ -1,8 +1,8 @@
 $schema: https://azuremlschemas.azureedge.net/latest/pipelineJob.schema.json
 type: pipeline
-display_name: used_cars_pipeline  # Provide the display name for the pipeline
-experiment_name: used_cars_price_prediction_pipeline  # Provide the experiment name
-description: End-to-end pipeline for used car price prediction with hyperparameter tuning.  # Provide the description for the pipeline
+display_name: used_cars_pipeline # Provide the display name for the pipeline
+experiment_name: used_cars_price_prediction_pipeline # Provide the experiment name
+description: End-to-end pipeline for used car price prediction with hyperparameter tuning. # Provide the description for the pipeline
 
 inputs:
   raw_data:
@@ -11,9 +11,9 @@ inputs:
 
 outputs:
   train_data:
-    type: uri_folder  # Specify the type for train_data output
+    type: uri_folder # Specify the type for train_data output
   test_data:
-    type: uri_folder  # Specify the type for test_data output
+    type: uri_folder # Specify the type for test_data output
   model_info_output_path:
     type: mlflow_model # Specify the type for model_info_output_path output
 
@@ -24,14 +24,13 @@ settings:
 
 jobs:
   prep_data:
-    name: data-prep  # Provide the job name
-    display_name: prep-data  # Provide the display name for the job
+    name: data-prep # Provide the job name
+    display_name: prep-data # Provide the display name for the job
     code: ../../../data-science/src
     command: >-
       python prep.py  
-      --raw_data ${{inputs.raw_data}} 
-      --train_data ${{outputs.train_data}}
-      --test_data ${{outputs.test_data}} 
+      --raw_data ${{inputs.raw_data}}  --train_data ${{outputs.train_data}} --test_data ${{outputs.test_data}} 
+
     environment: azureml:used-cars-train-env@latest
     inputs:
       raw_data: ${{parent.inputs.raw_data}}
@@ -41,7 +40,7 @@ jobs:
 
   sweep_step:
     name: sweep_job
-    display_name: sweep_job  # Hint: Provide the display name for the job
+    display_name: sweep_job # Hint: Provide the display name for the job
     type: sweep
     inputs:
       train_data: ${{parent.jobs.prep_data.outputs.train_data}}
@@ -49,17 +48,13 @@ jobs:
     outputs:
       model_output:
         type: mlflow_model
-    sampling_algorithm: grid  # Specify the sampling algorithm
+    sampling_algorithm: grid # Specify the sampling algorithm
     trial:
       type: command
       code: ../../../data-science/src
       command: >-
-        python train.py 
-        --train_data ${{inputs.train_data}}
-        --test_data ${{inputs.test_data}}
-        --n_estimators ${{inputs.n_estimators}}
-        --max_depth ${{inputs.max_depth}}
-        --model_output ${{outputs.model_output}}
+        python train.py  --train_data ${{inputs.train_data}} --test_data ${{inputs.test_data}} --n_estimators ${{inputs.n_estimators}} --max_depth ${{inputs.max_depth}} --model_output ${{outputs.model_output}}
+
       environment: azureml:used-cars-train-env@latest
       inputs:
         train_data:
@@ -90,20 +85,16 @@ jobs:
       max_concurrent_trials: 10
       timeout: 7200
 
-
   register_model:
-    name: register_model  # Provide the job name
-    display_name: register-model  # Provide the display name for the job
+    name: register_model # Provide the job name
+    display_name: register-model # Provide the display name for the job
     code: ../../../data-science/src
     command: >-
-      python register.py 
-      --model_name ${{inputs.model_name}} 
-      --model_path ${{inputs.model_path}} 
-      --model_info_output_path ${{outputs.model_info_output_path}}
+      python register.py  --model_name ${{inputs.model_name}}  --model_path ${{inputs.model_path}}  --model_info_output_path ${{outputs.model_info_output_path}}
+
     environment: azureml:used-cars-train-env@latest
     inputs:
       model_name: "used_cars_price_prediction_model"
       model_path: ${{parent.jobs.sweep_step.outputs.model_output}}
     outputs:
       model_info_output_path: ${{parent.outputs.model_info_output_path}}
-
