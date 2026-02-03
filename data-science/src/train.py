@@ -92,7 +92,7 @@ def main():
         print(f"Mean Squared Error: {mse}")
 
         # Log the MSE metric
-        mlflow.log_metric("mse", mse)
+        mlflow.log_metric("MSE", mse)
 
         # Save the model
         logging.info(f"Saving model to: {args.model_output}")
