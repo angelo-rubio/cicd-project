@@ -17,6 +17,5 @@ variables:
   ado_service_connection_aml_ws: Azure-ARM-Prod
 
   # For pipeline reference
-  resource_group: resource_group_gl
-  aml_workspace: ml2
-
+  resource_group: angelo_ai
+  aml_workspace: angelo_ml_studio
